@@ -7,12 +7,24 @@ import multer from "multer";
 import * as dotenv from "dotenv"; // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
-
-mongoose.connect("mongodb+srv://<username>:<password>@cluster0.eyhty.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-
-
-
 dotenv.config();
+
+
+mongoose.connect(process.env.MONGO_CONNECT + "customers");
+
+// Create a schema Step 3 of Assignment 5
+const infoSchema = new mongoose.Schema({
+	name: String,
+	movie: String,
+	email: { type: String, required: true },
+});
+
+// Create a model Step 4 of Assignment 5
+const Info = mongoose.model( 'Info', infoSchema );
+
+
+
+
 
 const jsonParser = bodyParser.json();
 
@@ -43,6 +55,29 @@ console.log(movieData);
     {"title":"Titanic"},
     {"title":"Die Hard"}
 ];*/
+
+
+
+
+
+// Step 5 of Assignment 5
+app.post("/api/addInfo", jsonParser, async (req, res) => {
+	
+	const custInfo = new Info(req.body);
+	try{
+		await custInfo.save();
+	} catch(err){
+		console.log("Error saving customer info");
+		res.sendStatus(206)
+		return;
+	}
+	res.sendStatus(200);
+
+});
+
+
+
+
 
 app.get("/api/movies", async (req, res) => {
 	//res.json(movieData)
